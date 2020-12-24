@@ -59,6 +59,7 @@ unsigned long timeNow=resetCounter;
 int i=resetCounter;
 int beginningTime=resetCounter;
 int btnSwitchState=resetCounter;
+int btnModeState=resetCounter;
 int btnPrevState=resetCounter;
 int btnNextState=resetCounter;
 int metronomeMode=0;
@@ -125,6 +126,7 @@ void loop() {
 }
 void CheckButtonStates(){
   btnSwitchState=digitalRead(BTN_SWITCH_PIN);
+  btnModeState=digitalRead(BTN_MODE_PIN);
   btnPrevState=digitalRead(BTN_PREV_PIN);
   btnNextState=digitalRead(BTN_NEXT_PIN);
 
@@ -133,6 +135,11 @@ void CheckButtonStates(){
     delay(switchDelay);
   }
 
+  else if(btnModeState==HIGH){//THIS IS FORE MODE SELECTOR PIN
+    ChangeMode();
+    delay(switchDelay);
+  }
+  
   else if(btnNextState==HIGH){
     if(modeState==metronomeMode){
       if(noteIndex>=lastNoteIndex)
@@ -176,6 +183,17 @@ void CheckButtonStates(){
     }
 
     delay(switchDelay);
+  }
+}
+
+void ChangeMode(){
+  if(modeState==metronomeMode){
+    modeState=tunerMode;
+    playFrequency=true;
+  }
+  else{
+    modeState=metronomeMode;
+    DisplayNoteValue(noteName[noteIndex]); //Metronome mode shows the note values on the LCD screen.
   }
 }
 
