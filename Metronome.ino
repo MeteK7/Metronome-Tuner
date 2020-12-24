@@ -1,5 +1,6 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
+#include "notes.h"
 
 //I2C pins declaration
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE); 
@@ -51,20 +52,21 @@ float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only 
 int buzzerAFirstTone=220;//Note A.
 int buzzerASecondTone=440;//Note A.
 int buzzerTones[indicatorAmount]={buzzerASecondTone, buzzerAFirstTone, buzzerAFirstTone, buzzerAFirstTone};
+int noteFrequency=buzzerASecondTone;//Default note
 
 int resetCounter=0;
 unsigned long timeNow=resetCounter;
 int i=resetCounter;
 int beginningTime=resetCounter;
 int btnSwitchState=resetCounter;
-int btnModeState=resetCounter;
 int btnPrevState=resetCounter;
 int btnNextState=resetCounter;
 int metronomeMode=0;
 int tunerMode=1;
 int modeState=metronomeMode; //Defaultly, it is on metronome mode.
+bool turnOnSystem=true;
 bool turnOnIndicators=true;
-
+bool playFrequency;
 
 
 void setup() {
@@ -90,6 +92,7 @@ void setup() {
 void loop() {
   CheckButtonStates();//Checking the button states in every loop.
 
+  if(turnOnSystem==true){//TRY TO IMPROVE THIS LINE.
    if(modeState==metronomeMode){
     if(turnOnIndicators==true){
       tone(BUZZER, buzzerTones[i],indicatorDuration);
@@ -107,22 +110,29 @@ void loop() {
       if(i>=indicatorAmount)
         i=resetCounter;
     } 
+   }
+   else{//IT SHOULD BE ENOUGH TO PLAY THE NOTE JUST ONCE. NO NEED FOR THAT IN EVERY LOOP. FIX IT!!
+    if(playFrequency==true){
+      tone(BUZZER,noteFrequency);
+      
+      Serial.print("Note Frequency: ");
+      Serial.println(noteFrequency);
+      DisplayNoteFrequency(noteFrequency);
+      playFrequency=false;//It is enough to play the frequency once otherwise it will be running the code "tone(BUZZER,noteFrequency);" every loop.
+    }
+   }
  }
 }
 void CheckButtonStates(){
   btnSwitchState=digitalRead(BTN_SWITCH_PIN);
-  btnModeState=digitalRead(BTN_MODE_PIN);
   btnPrevState=digitalRead(BTN_PREV_PIN);
   btnNextState=digitalRead(BTN_NEXT_PIN);
 
   if(btnSwitchState==HIGH){
+    TurnOnOffSystem();
     delay(switchDelay);
   }
 
-  else if(btnModeState==HIGH){//THIS IS FORE MODE SELECTOR PIN
-    delay(switchDelay);
-  }
-  
   else if(btnNextState==HIGH){
     if(modeState==metronomeMode){
       if(noteIndex>=lastNoteIndex)
@@ -133,6 +143,12 @@ void CheckButtonStates(){
   
        tempoDelay=oneMinute/note[noteIndex];
        DisplayNoteValue(noteName[noteIndex]);
+    }
+
+    else{// If the mode state is tuner, then deal with the note frequency instead of not value.
+      noteFrequency++;
+      playFrequency=true;
+      Serial.println(playFrequency);
     }
     /*This is for preventing fast button clicking.
     This will run only one time when you click the button.
@@ -152,17 +168,42 @@ void CheckButtonStates(){
       tempoDelay=oneMinute/note[noteIndex];
       DisplayNoteValue(noteName[noteIndex]);
     }
+    
+    else{// If the mode state is tuner, then deal with the note frequency instead of not value.
+      noteFrequency--;
+      playFrequency=true;
+      Serial.println(playFrequency);
+    }
 
     delay(switchDelay);
   }
 }
 
+void TurnOnOffSystem(){
+  if(turnOnSystem==true){
+    turnOnSystem=false;
+    noTone(BUZZER);
+    lcd.noBacklight();
+  }      
+  else{
+    turnOnSystem=true;
+    playFrequency=true;// If the mode was in tuner when the system was turned off, then change the value of variable "playFrequency" with true to play the frequency again.
+    lcd.backlight();
+  }  
+}
 void DisplayNoteValue(String noteName){
   lcd.clear();
   lcd.print("BPM: ");
   lcd.print(note[noteIndex]);
   lcd.setCursor(lcdNextLineCol,lcdNextLineRow);
   lcd.print(noteName);
+}
+
+void DisplayNoteFrequency(int noteFrequency){
+  lcd.clear();
+  lcd.print("Note Frequency:");
+  lcd.setCursor(lcdNextLineCol,lcdNextLineRow);
+  lcd.print(noteFrequency);
 }
 /*
 // declare the constants for the five LEDS
