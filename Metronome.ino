@@ -129,14 +129,12 @@ void CheckButtonStates(){
   else if(btnNextState==HIGH){
     if(modeState==metronomeMode){
        bpm++;
-       tempoDelay=oneMinute/bpm;
-       DisplayBPM(bpm);
+       CalculateTempoDelay();
     }
 
     else{// If the mode state is tuner, then deal with the note frequency instead of not value.
       noteFrequency++;
-      playFrequency=true;
-      Serial.println(playFrequency);
+      PlayFrequency();
     }
     /*This is for preventing fast button clicking.
     This will run only one time when you click the button.
@@ -148,20 +146,27 @@ void CheckButtonStates(){
   else if(btnPrevState==HIGH){
     if(modeState==metronomeMode){
        bpm--;
-       tempoDelay=oneMinute/bpm;
-       DisplayBPM(bpm);
+       CalculateTempoDelay();
     }
     
     else{// If the mode state is tuner, then deal with the note frequency instead of not value.
       noteFrequency--;
-      playFrequency=true;
-      Serial.println(playFrequency);
+      PlayFrequency();
     }
-
+    
     delay(switchDelay);
   }
 }
 
+void CalculateTempoDelay(){
+   tempoDelay=oneMinute/bpm;
+   DisplayBPM(bpm);
+}
+
+void PlayFrequency(){
+  playFrequency=true;
+  Serial.println(playFrequency);
+}
 void ChangeMode(){
   if(modeState==metronomeMode){
     modeState=tunerMode;
