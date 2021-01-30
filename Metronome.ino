@@ -31,20 +31,7 @@ int ledArray[indicatorAmount] = {LED1, LED2, LED3, LED4};
 
 float oneMinute=60000; //1000 milliseconds is equal to 1 second. 1000*60 milliseconds is equal to 60 seconds(1 minute).
 
-float wholeNote=15; //There are 15 beats for whole note (4 beats(seconds)) per minute. You will hear 4 beats 240 times in one minute.
-float halfNote=30; //There are 30 beats for half note (2 beats(seconds)) per minute. You will hear 2 beats 240 times in one minute.
-float quarterNote=60; //There are 60 beats for quarter note (1 beat(second)) per minute. You will hear 1 beat 240 times in one minute.
-float eightNote=120; //There are 120 beats for eight note (1/2 beat(second)) per minute. You will hear 1/2 beat 240 times in one minute.
-float sixteenthNote=240; //There are 240 for beats sixteenth note (1/4 beat(second)) per minute. You will hear 1/4 beat 240 times in one minute.
-
-int noteIndex;
-const int noteAmount=5;
-int firstNoteIndex=0;
-int lastNoteIndex=4;
-
-float note[noteAmount]={wholeNote, halfNote, quarterNote, eightNote, sixteenthNote};
-String noteName[noteAmount]={"Whole Note", "Half Note", "Quarter Note", "Eight Note", "Sixteenth Note"};
-
+int bpm=60;
 float tempoDelay;
 float switchDelay=200;
 float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only for the beginning of the beat. Since the sound is just an indicator which shows the beat changes to the artist, 100ms is enough to indicate.
@@ -76,8 +63,6 @@ void setup() {
  lcd.backlight();//To Power ON the back light
 //lcd.noBacklight();// To Power OFF the back light
 
- /* Print a message to the LCD.
- lcd.print("hello, world!");*/
  pinMode(LED1, OUTPUT);
  pinMode(LED2, OUTPUT);
  pinMode(LED3, OUTPUT);
@@ -85,9 +70,10 @@ void setup() {
  pinMode(BUZZER, OUTPUT); // Set buzzer - pin 8 as an output
  pinMode(BTN_NEXT_PIN, INPUT);
  Serial.begin(9600);
- noteIndex=resetCounter;
- tempoDelay=oneMinute/note[noteIndex];
- DisplayNoteValue(noteName[noteIndex]);
+ 
+ tempoDelay=oneMinute/bpm;
+ Serial.println(tempoDelay);
+ DisplayBPM(bpm);
 }
 
 void loop() {
@@ -97,10 +83,10 @@ void loop() {
    if(modeState==metronomeMode){
     if(turnOnIndicators==true){
       tone(BUZZER, buzzerTones[i],indicatorDuration);
+      
       digitalWrite(ledArray[i],HIGH);
       turnOnIndicators=false;//It is enough to turn it on once before quarterNote has been reached.
     }
-    
     if(millis()>=tempoDelay+timeNow){
       timeNow+=tempoDelay;
       //noTone(BUZZER);
@@ -112,7 +98,7 @@ void loop() {
         i=resetCounter;
     } 
    }
-   else{//IT SHOULD BE ENOUGH TO PLAY THE NOTE JUST ONCE. NO NEED FOR THAT IN EVERY LOOP. FIX IT!!
+   else{//Tuner Mode //IT SHOULD BE ENOUGH TO PLAY THE NOTE JUST ONCE. NO NEED FOR THAT IN EVERY LOOP. FIX IT!!
     if(playFrequency==true){
       tone(BUZZER,noteFrequency);
       
@@ -142,14 +128,9 @@ void CheckButtonStates(){
   
   else if(btnNextState==HIGH){
     if(modeState==metronomeMode){
-      if(noteIndex>=lastNoteIndex)
-        noteIndex=resetCounter;
-  
-      else
-       noteIndex++;
-  
-       tempoDelay=oneMinute/note[noteIndex];
-       DisplayNoteValue(noteName[noteIndex]);
+       bpm++;
+       tempoDelay=oneMinute/bpm;
+       DisplayBPM(bpm);
     }
 
     else{// If the mode state is tuner, then deal with the note frequency instead of not value.
@@ -166,14 +147,9 @@ void CheckButtonStates(){
 
   else if(btnPrevState==HIGH){
     if(modeState==metronomeMode){
-      if(noteIndex<=firstNoteIndex)
-        noteIndex=lastNoteIndex;
-  
-      else
-       noteIndex--;
-
-      tempoDelay=oneMinute/note[noteIndex];
-      DisplayNoteValue(noteName[noteIndex]);
+       bpm--;
+       tempoDelay=oneMinute/bpm;
+       DisplayBPM(bpm);
     }
     
     else{// If the mode state is tuner, then deal with the note frequency instead of not value.
@@ -193,7 +169,7 @@ void ChangeMode(){
   }
   else{
     modeState=metronomeMode;
-    DisplayNoteValue(noteName[noteIndex]); //Metronome mode shows the note values on the LCD screen.
+    DisplayBPM(bpm); //Metronome mode shows the note values on the LCD screen.
   }
 }
 
@@ -209,12 +185,10 @@ void TurnOnOffSystem(){
     lcd.backlight();
   }  
 }
-void DisplayNoteValue(String noteName){
+void DisplayBPM(int bpm){
   lcd.clear();
   lcd.print("BPM: ");
-  lcd.print(note[noteIndex]);
-  lcd.setCursor(lcdNextLineCol,lcdNextLineRow);
-  lcd.print(noteName);
+  lcd.print(bpm);
 }
 
 void DisplayNoteFrequency(int noteFrequency){
@@ -223,80 +197,3 @@ void DisplayNoteFrequency(int noteFrequency){
   lcd.setCursor(lcdNextLineCol,lcdNextLineRow);
   lcd.print(noteFrequency);
 }
-/*
-// declare the constants for the five LEDS
-const int LED1 = 2;
-const int LED2 = 3;
-const int LED3 = 4;
-const int LED4 = 5;
-const int BUZZER = 6; //Buzzer to arduino pin 6
-const int BTN_NEXT_PIN=13;
-
-int btnNextState=0;
-const int ledAmount=4;
-const int noteAmount=5;
-int noteIndex;
-
-int ledArray[ledAmount] = {LED1, LED2, LED3, LED4};
-
-float oneMinute=60000; //1000 milliseconds is equal to 1 second. 1000*60 milliseconds is equal to 60 seconds(1 minute).
-
-float wholeNote=15; //There are 15 beats for whole note (4 beats(seconds)) per minute. You will hear 4 beats 240 times in one minute.
-float halfNote=30; //There are 30 beats for half note (2 beats(seconds)) per minute. You will hear 2 beats 240 times in one minute.
-float quarterNote=60; //There are 60 beats for quarter note (1 beat(second)) per minute. You will hear 1 beat 240 times in one minute.
-float eightNote=120; //There are 120 beats for eight note (1/2 beat(second)) per minute. You will hear 1/2 beat 240 times in one minute.
-float sixteenthNote=240; //There are 240 for beats sixteenth note (1/4 beat(second)) per minute. You will hear 1/4 beat 240 times in one minute.
-
-float note[noteAmount]={wholeNote, halfNote, quarterNote, eightNote, sixteenthNote};
-
-float tempoDelay;
-float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only for the beginning of the beat. Since the sound is just an indicator which shows the beat changes to the artist, 100ms is enough to indicate.
-//float leftDelay;
-
-int buzzerAFirstTone=220;//Note A.
-int buzzerASecondTone=440;//Note A.
-int buzzerTones[4]={buzzerASecondTone, buzzerAFirstTone, buzzerAFirstTone, buzzerAFirstTone};
-
-
-void setup() {
- //Serial.begin(9600); // initialize Serial connection
- pinMode(LED1, OUTPUT);
- pinMode(LED2, OUTPUT);
- pinMode(LED3, OUTPUT);
- pinMode(LED4, OUTPUT);
- pinMode(BUZZER, OUTPUT); // Set buzzer - pin 8 as an output
- pinMode(BTN_NEXT_PIN, INPUT);
- Serial.begin(9600);
- noteIndex=2;
-}
-void loop() {
- for(int i=0; i<4; i++){
-   btnNextState=digitalRead(BTN_NEXT_PIN);
-   Serial.println(btnNextState);
-   if(btnNextState==HIGH){
-      if(noteIndex>=noteAmount)
-        noteIndex=0;
-      else
-        noteIndex+=1;
-
-      Serial.println(tempoDelay);
-      Serial.println(leftDelay);
-   }
-     
-   tempoDelay=oneMinute/note[noteIndex];
-   //leftDelay=tempoDelay-indicatorDuration;//The rest of the tempoDelay.
-     
-   tone(BUZZER, buzzerTones[i],indicatorDuration);
-   digitalWrite(ledArray[i],HIGH);
-     
-   delay(tempoDelay);//Delaying one second(Quarter Note) to keep the light on till to the next led.   
-
-   noTone(BUZZER);
-   digitalWrite(ledArray[i],LOW);
-     
- }
-}
-
-void checkBtnNextState(){
-  
-}*/
