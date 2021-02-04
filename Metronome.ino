@@ -1,14 +1,10 @@
-#include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
-#include "notes.h"
+#include <Wire.h> //This library allows you to communicate with I2C / TWI devices.
+#include <LiquidCrystal_I2C.h> //The library allows to control I2C displays with functions extremely similar to LiquidCrystal library.
+#include "notes.h"//We have our notes with their frequencies in this file.
 
 //I2C pins declaration
-LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE); 
+LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE); //// Setting the LCD I2C address
 
-// initialize the library by associating any needed LCD interface pin
-// with the arduino pin number it is connected to
-//const int rs = 12, en = 11, d4 = 10, d5 = 9, d6 = 8, d7 = 7;
-//LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 const int lcdRow=2;
 const int lcdCol=16;
 const int lcdNextLineRow=1;
@@ -23,7 +19,7 @@ const int BTN_NEXT_PIN=6;
 const int BTN_PREV_PIN=7;
 const int BTN_SWITCH_PIN=8;
 const int BTN_MODE_PIN=9;
-const int BUZZER = 10; //Buzzer to arduino pin 9
+const int BUZZER = 10; //Buzzer to arduino pin 10
 
 const int indicatorAmount=4;
 
@@ -58,21 +54,22 @@ bool playFrequency;
 
 
 void setup() {
- Serial.begin(9600); // initialize Serial connection
- lcd.begin(lcdCol, lcdRow);
- lcd.backlight();//To Power ON the back light
-//lcd.noBacklight();// To Power OFF the back light
+ lcd.begin(lcdCol, lcdRow); //This command sets up the LCD number of columns and rows. We have an LCD with 16 columns and 4 rows. 
+ lcd.backlight();//This command is for turning on the back light of our lcd.
+//lcd.noBacklight();// If you want to turn the backlight off, then use this command.
 
  pinMode(LED1, OUTPUT);
  pinMode(LED2, OUTPUT);
  pinMode(LED3, OUTPUT);
  pinMode(LED4, OUTPUT);
- pinMode(BUZZER, OUTPUT); // Set buzzer - pin 8 as an output
+ pinMode(BUZZER, OUTPUT);
+ pinMode(BTN_PREV_PIN, INPUT);
  pinMode(BTN_NEXT_PIN, INPUT);
+ pinMode(BTN_SWITCH_PIN, INPUT);
+ pinMode(BTN_MODE_PIN, INPUT);
  Serial.begin(9600);
  
  tempoDelay=oneMinute/bpm;
- Serial.println(tempoDelay);
  DisplayBPM(bpm);
 }
 
@@ -199,6 +196,6 @@ void DisplayBPM(int bpm){
 void DisplayNoteFrequency(int noteFrequency){
   lcd.clear();
   lcd.print("Note Frequency:");
-  lcd.setCursor(lcdNextLineCol,lcdNextLineRow);
+  lcd.setCursor(lcdNextLineCol,lcdNextLineRow); //This command will set cursor to first column of second row. 
   lcd.print(noteFrequency);
 }
