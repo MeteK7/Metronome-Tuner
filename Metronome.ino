@@ -5,29 +5,41 @@
 //I2C pins declaration
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE); //// Setting the LCD I2C address
 
+//LCD 16x2 includes 16 columns and 2 rows.
 const int lcdRow=2;
 const int lcdCol=16;
+
+//Coordinating the cursor to the first column of second row on our LCD.
 const int lcdNextLineRow=1;
 const int lcdNextLineCol=0;
 
-// declare the constants for the five LEDS
+//Declare the constants for the four LEDS.
 const int LED1 = 2;
 const int LED2 = 3;
 const int LED3 = 4;
 const int LED4 = 5;
+
+//Declaring the four buttons for our project.
 const int BTN_NEXT_PIN=6;
 const int BTN_PREV_PIN=7;
 const int BTN_SWITCH_PIN=8;
 const int BTN_MODE_PIN=9;
+
 const int BUZZER = 10; //Buzzer to arduino pin 10
 
-const int indicatorAmount=4;
+//We have an array called ledArray. We are going to use it to turn on the LEDs respectively at each beat change.
 
+/*Firstly, I've declared the size of the array in a variable. It is always a good practice to define the size of an array with a variable, instead of defining the size number directly in the array.
+Because you might want to use this variable anywhere else, and then if you haven't defined this number as a variable, you will have to change this number everywhere.
+However, when you define it as a variable, the change you make in one place will change all the places where you use this variable.
+*/
+const int indicatorAmount=4;
 int ledArray[indicatorAmount] = {LED1, LED2, LED3, LED4};
 
-float oneMinute=60000; //1000 milliseconds is equal to 1 second. 1000*60 milliseconds is equal to 60 seconds(1 minute).
+//1.0000 milliseconds equals 1 second. 1000*60(60.000) milliseconds equals 60 seconds which is 1 minute.
+int oneMinute=60000;
 
-int bpm=60;
+int bpm=60; //I've assigned 60 to the variable bpm as a default value, then you will be able to change it using prev and next buttons.
 float tempoDelay;
 float switchDelay=200;
 float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only for the beginning of the beat. Since the sound is just an indicator which shows the beat changes to the artist, 100ms is enough to indicate.
