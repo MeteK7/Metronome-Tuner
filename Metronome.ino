@@ -40,7 +40,7 @@ int ledArray[indicatorAmount] = {LED1, LED2, LED3, LED4};
 int oneMinute=60000;
 
 int bpm=60; //I've assigned 60 to the variable bpm as a default value, then you will be able to change it using prev and next buttons.
-float tempoDelay;
+float beatDuration; // oneMinute over bpm will give us the beatDuration. For example 1min/120bpm will give us beat sound in every half of a second. This is the beat duration.
 float switchDelay=200;
 float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only for the beginning of the beat. Since the sound is just an indicator which shows the beat changes to the artist, 100ms is enough to indicate.
 
@@ -81,7 +81,7 @@ void setup() {
  pinMode(BTN_MODE_PIN, INPUT);
  Serial.begin(9600);
  
- tempoDelay=oneMinute/bpm;
+ beatDuration=oneMinute/bpm;
  DisplayBPM(bpm);
 }
 
@@ -96,8 +96,8 @@ void loop() {
       digitalWrite(ledArray[i],HIGH);
       turnOnIndicators=false;//It is enough to turn it on once before quarterNote has been reached.
     }
-    if(millis()>=tempoDelay+timeNow){
-      timeNow+=tempoDelay;
+    if(millis()>=beatDuration+timeNow){
+      timeNow+=beatDuration;
       //noTone(BUZZER);
       digitalWrite(ledArray[i],LOW);  
       i++;
@@ -138,7 +138,7 @@ void CheckButtonStates(){
   else if(btnNextState==HIGH){
     if(modeState==metronomeMode){
        bpm++;
-       CalculateTempoDelay();
+       CalculateBeatDuration();
     }
 
     else{// If the mode state is tuner, then deal with the note frequency instead of not value.
@@ -155,7 +155,7 @@ void CheckButtonStates(){
   else if(btnPrevState==HIGH){
     if(modeState==metronomeMode){
        bpm--;
-       CalculateTempoDelay();
+       CalculateBeatDuration();
     }
     
     else{// If the mode state is tuner, then deal with the note frequency instead of not value.
@@ -167,8 +167,8 @@ void CheckButtonStates(){
   }
 }
 
-void CalculateTempoDelay(){
-   tempoDelay=oneMinute/bpm;
+void CalculateBeatDuration(){
+   beatDuration=oneMinute/bpm;
    DisplayBPM(bpm);
 }
 
