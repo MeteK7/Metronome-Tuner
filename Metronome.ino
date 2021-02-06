@@ -41,7 +41,7 @@ int oneMinute=60000;
 
 int bpm=60; //I've assigned 60 to the variable bpm as a default value, then you will be able to change it using prev and next buttons.
 float beatDuration; // oneMinute over bpm will give us the beatDuration. For example 1min/120bpm will give us beat sound in every half of a second. This is the beat duration.
-float switchDelay=200;
+float buttonDelay=200;///This is for preventing continuous button clicking. You can think that you click very short but because loop runs very fast, it may identify the clicking continuously.
 float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only for the beginning of the beat. Since the sound is just an indicator which shows the beat changes to the artist, 100ms is enough to indicate.
 
 int buzzerAFirstTone=220;//Note A.
@@ -60,9 +60,9 @@ int btnNextState=resetCounter;
 int metronomeMode=0;
 int tunerMode=1;
 int modeState=metronomeMode; //Defaultly, it is on metronome mode.
-bool turnOnSystem=true;
-bool turnOnIndicators=true;
-bool playFrequency;
+bool turnOnSystem=true;//Defaultly, the system is turned on once you connect the arduino to the adapter.
+bool turnOnIndicators=true;//We are turning on the indicators for the first run.
+bool playFrequency;//We are allowing the frequency to be played in the tuner mode.
 
 
 void setup() {
@@ -70,19 +70,21 @@ void setup() {
  lcd.backlight();//This command is for turning on the back light of our lcd.
 //lcd.noBacklight();// If you want to turn the backlight off, then use this command.
 
+ //Here, we are configuring our LED and buzzer pins to behave as output.
  pinMode(LED1, OUTPUT);
  pinMode(LED2, OUTPUT);
  pinMode(LED3, OUTPUT);
  pinMode(LED4, OUTPUT);
  pinMode(BUZZER, OUTPUT);
+
+ //Here, we are configuring our button pins to behave as input. Why? Because, buttons are input devices that we are using to get datas from the user.
  pinMode(BTN_PREV_PIN, INPUT);
  pinMode(BTN_NEXT_PIN, INPUT);
  pinMode(BTN_SWITCH_PIN, INPUT);
  pinMode(BTN_MODE_PIN, INPUT);
- Serial.begin(9600);
  
- beatDuration=oneMinute/bpm;
- DisplayBPM(bpm);
+ beatDuration=oneMinute/bpm; //We are calculating our beat duration according to the default bpm. One minute over 60 bpm equals 1. So, you will here one beat in each second.
+ DisplayBPM(bpm);//We have a special function to display the bpm that we have defined, on the LCD screen. Let's compose our function called DisplayBPM.
 }
 
 void loop() {
@@ -107,7 +109,7 @@ void loop() {
         i=resetCounter;
     } 
    }
-   else{//Tuner Mode //IT SHOULD BE ENOUGH TO PLAY THE NOTE JUST ONCE. NO NEED FOR THAT IN EVERY LOOP. FIX IT!!
+   else{//Else, run the Tuner Mode --- In other words, if modeState equals tunerMode, then execute it.
     if(playFrequency==true){
       tone(BUZZER,noteFrequency);
       
@@ -127,12 +129,12 @@ void CheckButtonStates(){
 
   if(btnSwitchState==HIGH){
     TurnOnOffSystem();
-    delay(switchDelay);
+    delay(buttonDelay);
   }
 
   else if(btnModeState==HIGH){//THIS IS FORE MODE SELECTOR PIN
     ChangeMode();
-    delay(switchDelay);
+    delay(buttonDelay);
   }
   
   else if(btnNextState==HIGH){
@@ -149,7 +151,7 @@ void CheckButtonStates(){
     This will run only one time when you click the button.
     Meanwhile, the tempo will be also delayed for 200ms because of swichDelay time.
     But since we don't press the button all the time, there won't be any effect for tempo in a normal condition.*/
-    delay(switchDelay);
+    delay(buttonDelay);
   }
 
   else if(btnPrevState==HIGH){
@@ -163,7 +165,7 @@ void CheckButtonStates(){
       PlayFrequency();
     }
     
-    delay(switchDelay);
+    delay(buttonDelay);
   }
 }
 
