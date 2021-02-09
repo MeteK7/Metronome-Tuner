@@ -49,7 +49,7 @@ int buzzerASecondTone=440;//Note A.
 int buzzerTones[indicatorAmount]={buzzerASecondTone, buzzerAFirstTone, buzzerAFirstTone, buzzerAFirstTone};
 int noteFrequency=buzzerASecondTone;//Default note
 
-int resetCounter=0;
+int resetCounter=0;//We use the number 0 in many places to reset the values of the variables. If we have to use a specific value in multiple places, it is always a good practice to assign a specific value to a variable and then use it by variable.
 unsigned long timeNow=resetCounter;
 int i=resetCounter;
 int beginningTime=resetCounter;
