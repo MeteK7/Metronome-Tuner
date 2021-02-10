@@ -49,17 +49,17 @@ int buzzerASecondTone=440;//Note A.
 int buzzerTones[indicatorAmount]={buzzerASecondTone, buzzerAFirstTone, buzzerAFirstTone, buzzerAFirstTone};
 int noteFrequency=buzzerASecondTone;//Default note
 
-int resetCounter=0;//We use the number 0 in many places to reset the values of the variables. If we have to use a specific value in multiple places, it is always a good practice to assign a specific value to a variable and then use it by variable.
-unsigned long timeNow=resetCounter;
-int i=resetCounter;
-int beginningTime=resetCounter;
-int btnSwitchState=resetCounter;
-int btnModeState=resetCounter;
-int btnPrevState=resetCounter;
-int btnNextState=resetCounter;
-int metronomeMode=0;
-int tunerMode=1;
-int modeState=metronomeMode; //Defaultly, it is on metronome mode.
+int initialNumber=0;//We use the number 0 in many places to reset the values of the variables. If we have to use a specific value in multiple places, it is always a good practice to assign a specific value to a variable and then use it by variable.
+unsigned long timeNow=initialNumber;
+int i=initialNumber;
+int beginningTime=initialNumber;
+int btnSwitchState=initialNumber;
+int btnModeState=initialNumber;
+int btnPrevState=initialNumber;
+int btnNextState=initialNumber;
+int metronomeMode=initialNumber; //metronomeMode is zero.
+int tunerMode=1;//tunerMode is one.
+int modeState=metronomeMode; //Defaultly, modeState is on metronome mode. So, you will first see the metronomeMode on the LCD screen when you run the project.
 bool turnOnSystem=true;//Defaultly, the system is turned on once you connect the arduino to the adapter.
 bool turnOnIndicators=true;//We are turning on the indicators for the first run.
 bool playFrequency;//We are allowing the frequency to be played in the tuner mode.
@@ -106,7 +106,7 @@ void loop() {
       turnOnIndicators=true; 
       
       if(i>=indicatorAmount)
-        i=resetCounter;
+        i=initialNumber;
     } 
    }
    else{//Else, run the Tuner Mode --- In other words, if modeState equals tunerMode, then execute it.
