@@ -33,8 +33,8 @@ const int BUZZER = 10; //Buzzer to arduino pin 10
 Because you might want to use this variable anywhere else, and then if you haven't defined this number as a variable, you will have to change this number everywhere.
 However, when you define it as a variable, the change you make in one place will change all the places where you use this variable.
 */
-const int indicatorAmount=4;
-int ledArray[indicatorAmount] = {LED1, LED2, LED3, LED4};
+const int ledIndicatorAmount=4;
+int ledArray[ledIndicatorAmount] = {LED1, LED2, LED3, LED4};
 
 //1.0000 milliseconds equals 1 second. 1000*60(60.000) milliseconds equals 60 seconds which is 1 minute.
 int oneMinute=60000;
@@ -46,7 +46,7 @@ float indicatorDuration=100;//We do not turn on the buzzer for whole beat, only 
 
 int buzzerAFirstTone=220;//Note A.
 int buzzerASecondTone=440;//Note A.
-int buzzerTones[indicatorAmount]={buzzerASecondTone, buzzerAFirstTone, buzzerAFirstTone, buzzerAFirstTone};
+int buzzerTones[ledIndicatorAmount]={buzzerASecondTone, buzzerAFirstTone, buzzerAFirstTone, buzzerAFirstTone};
 int noteFrequency=buzzerASecondTone;//Default note
 
 int initialNumber=0;//We use the number 0 in many places to reset the values of the variables. If we have to use a specific value in multiple places, it is always a good practice to assign a specific value to a variable and then use it by variable.
@@ -98,14 +98,14 @@ void loop() {
       digitalWrite(ledArray[i],HIGH);
       turnOnIndicators=false;//It is enough to turn it on once before quarterNote has been reached.
     }
-    if(millis()>=beatDuration+timeNow){
-      timeNow+=beatDuration;
+    if(millis()>=beatDuration+timeNow){//If the elapsed time is greater than the beatDuration plus the variable timeNow, then, we need to turn the indicators on because the previos beat has finished so that we have to hear a new beat.
+      timeNow+=beatDuration;//Here, we need to add timeNow by itself and beatDuration to calculate the new beat time for the next loop. So, once the elapsed time is greater than beatDuration+timeNow, this nested if will be executed.
       //noTone(BUZZER);
-      digitalWrite(ledArray[i],LOW);  
+      digitalWrite(ledArray[i],LOW);//Turning off the led indicator in order to turn on the other led indicator in the next loop.
       i++;
       turnOnIndicators=true; 
       
-      if(i>=indicatorAmount)
+      if(i>=ledIndicatorAmount)
         i=initialNumber;
     } 
    }
